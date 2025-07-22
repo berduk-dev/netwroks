@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 )
 
@@ -15,29 +17,29 @@ type Post struct {
 }
 
 func main() {
-	resp, err := http.Get("https://jsonplaceholder.typicode.com/posts")
+	post1 := Post{
+		UserID: 1,
+		ID:     321,
+		Title:  "Первый пост",
+		Body:   "The first post",
+	}
+
+	marshalledPost, err := json.Marshal(post1)
 	if err != nil {
-		fmt.Printf("Ошибка: %v\n", err)
-		return
+		log.Println(err)
 	}
 
-	if resp.StatusCode != 200 {
-		fmt.Printf("Ошибка. Статус код = %d\n", resp.StatusCode)
-		return
-	}
+	url := "https://httpbin.org/post"
 
-	bytes, err := io.ReadAll(resp.Body)
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(marshalledPost))
 	if err != nil {
-		fmt.Printf("Не смог прочитать: %v\n", err)
-		return
+		log.Println(err)
 	}
 
-	var posts []Post
-
-	err = json.Unmarshal(bytes, &posts)
+	bytesResp, err := io.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println("Не удалось анмаршалить: ", err)
+		log.Println(err)
 	}
 
-	fmt.Printf("%+v", posts)
+	fmt.Println(string(bytesResp))
 }
