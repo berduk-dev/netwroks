@@ -7,7 +7,13 @@ import (
 
 func main() {
 
-	randomNum := rand.Intn(10)
+	fmt.Print("Введите интервал случайного числа: ")
+	var a, b int
+	fmt.Scan(&a, &b)
+
+	var randomNum int
+
+	randomNum = rand.Intn(b-a) + a
 
 	var guessableNum int
 	for {
