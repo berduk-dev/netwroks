@@ -160,11 +160,15 @@ func (h *Handler) UpdatePost(c *gin.Context) {
 		log.Println("error post update ", err)
 		return
 	}
-	
+
 	err = h.db.QueryRow(c, "SELECT id, title, body, created_at FROM posts WHERE id = $1", id).Scan(
 		&updatePostRequest.Title,
 		&updatePostRequest.Body,
 	)
+	if err != nil {
+		log.Println("Ошибка при изменении поста: ", err)
+		return
+	}
 
 	c.JSON(http.StatusOK, fmt.Sprintf("Пост №%d изменён!", id))
 }
