@@ -125,7 +125,7 @@ func (h *Handler) DeletePost(c *gin.Context) {
 	_, err = h.db.Exec(c, "DELETE FROM posts WHERE id=$1", id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, "Что-то пошло не так!")
-		log.Println("error insert into posts ", err)
+		log.Println("error post delete", err)
 		return
 	}
 
@@ -154,8 +154,13 @@ func (h *Handler) UpdatePost(c *gin.Context) {
 		return
 	}
 
-	h.db.Exec(c, "UPDATE posts SET title = $1, body = $2", updatePostRequest.Title, updatePostRequest.Body)
-
+	_, err = h.db.Exec(c, "UPDATE posts SET title = $1, body = $2", updatePostRequest.Title, updatePostRequest.Body)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, "Что-то пошло не так!")
+		log.Println("error post update ", err)
+		return
+	}
+	
 	err = h.db.QueryRow(c, "SELECT id, title, body, created_at FROM posts WHERE id = $1", id).Scan(
 		&updatePostRequest.Title,
 		&updatePostRequest.Body,
